@@ -40,17 +40,14 @@ public class ARITHInterpreter {
   public static void main(String[] args) {
     int i1 = new Integer(args[0]);
     int i2 = new Integer(args[1]);
+    int out = new Integer(args[2]);
     // Input
     AST t1 = new AST(i1);
     AST t2 = new AST(i2);
     test(i1, 0, "i", 1, i1);
     test(i2, 0, "i", 2, i2);
 
-    //out.println("Test 1: " + t1);
-    //out.println(i1 == eval(t1));
-    //out.println("Test 2: " + t2);
-    //out.println(i2 == eval(t2));
-    //out.println();
+    
 
     // i1 + i2
     AST t3 = test(i1, i2, "+", 3, i1+i2);
@@ -69,10 +66,6 @@ public class ARITHInterpreter {
 
     // i2!
     test(null, i2, "!", 8, factorial(i2));
-    //AST tree8 = new AST(new AST(i2), null, "!");
-    //out.println("Test 8: " + tree8);
-    //out.println(eval(tree8));
-    //out.println();
 
     // bin(5, i2)
     test(5, i2, "C", 9, binomial(5, i2));
@@ -114,7 +107,7 @@ public class ARITHInterpreter {
   }
 
   /** Evaluate expression tree.
-   *  5 cases: int, sum, multiply, binomial, factorial.
+   *  8 expressions: int, sum, subtract, multiply, binomial, factorial, division, exponential.
    */
   public static int eval(AST tree) {
     switch (tree.type) {
@@ -122,8 +115,14 @@ public class ARITHInterpreter {
       case "IntExp": return tree.data;
       case "+"     :
       case "SumExp": return eval(tree.left) + eval(tree.right);
+      case "-"     :
+      case "SubExp": return eval(tree.left) - eval(tree.right);
+      case "^"     :
+      case "PowExp": return power(eval(tree.left), eval(tree.right));
       case "*"     :
       case "MulExp": return eval(tree.left) * eval(tree.right);
+      case "/"     :
+      case "DivExp": return eval(tree.left) / eval(tree.right);
       case "C"     :
       case "BinExp": return binomial(eval(tree.left), eval(tree.right));
       case "!"     :
@@ -132,6 +131,15 @@ public class ARITHInterpreter {
     }
     //TODO handle exception
     return 0;
+  }
+
+  /** Compute x^a recursively. */
+  private static int power(int x, int a) {
+    if (a == 0) return 1;
+    if (a == 1) return x;
+    int half = power(x, a/2);
+    if (x % 2 == 0) return half * half;
+    else return x * half * half;
   }
 
   /** Compute bin(n, k) recursively. */
