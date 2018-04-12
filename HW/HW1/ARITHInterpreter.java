@@ -12,25 +12,21 @@ class AST {
     this.right = right;
     this.type = type;
   }
-
   public AST(AST left, int right, String type) {
     this.left = left;
     this.right = new AST(right);
     this.type = type;
   }
-
   public AST(int left, AST right, String type) {
     this.left = new AST(left);
     this.right = right;
     this.type = type;
   }
-
   public AST(int left, int right, String type) {
     this.left = new AST(left);
     this.right = new AST(right);
     this.type = type;
   }
-
   public AST(int data) {
     this.type = "IntExp";
     this.data = data;
@@ -105,7 +101,9 @@ public class ARITHInterpreter {
 
   /** Compute bin(n, k) recursively. */
   private static int binomial(int n, int k) {
-    if ((n < k) || (n < 0 || k < 0)) return 0;
+    // Bad arguments
+    if ((n < k) || (n < 0 || k < 0)) return -1;
+
     if ((n == k) || (k == 0))
       return 1;
     else
@@ -115,9 +113,7 @@ public class ARITHInterpreter {
   /** Compute n! in a loop. */
   private static int factorial(int n) {
     if (n < 0) return 0;
-    if (n == 0) return 1;
-    int f = n;
-    for (int i = n-1; i > 1; i--) f *= i;
-    return f;
+    if (n == 0 || n == 1) return 1;
+    return n * factorial(n-1);
   }
 }
