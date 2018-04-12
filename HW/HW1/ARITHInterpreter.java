@@ -58,9 +58,14 @@ class AST {
 public class ARITHInterpreter {
   public static void main(String[] args) {
     // 8 ^ 7 - 6! + C(5 * 3,  4 / 2 - 1)
-    AST test = new AST(new AST(new AST(8, 7, "^"), new AST(6, 0, "!"), "-"), new AST(new AST(5, 3, "*"), new AST(new AST(4, 2, "/"), 1, "-"), "C"), "+");
-    out.println(test);
-    out.println(2096447 == eval(test));
+    AST test1 = new AST(new AST(new AST(8, 7, "^"), new AST(6, 0, "!"), "-"), new AST(new AST(5, 3, "*"), new AST(new AST(4, 2, "/"), 1, "-"), "C"), "+");
+    out.println(test1);
+    out.println(2096447 == eval(test1));
+
+    // (2! ^ 4) * C(7+1-5, 6/3)
+    AST test2 = new AST(new AST(new AST(2, 0, "!"), 4, "^"), new AST(new AST(7, new AST(1, 5, "-"), "+"), new AST(6, 3, "/"), "C"), "*");
+    out.println(test2);
+    out.println(48 == eval(test2));
   }
 
   /** Evaluate expression tree.
