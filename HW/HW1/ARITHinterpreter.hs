@@ -1,3 +1,13 @@
+---------------------
+--Program: ARITHinterpreter.hs
+--Authors: Johnnie Chang and Wei-Lin Wu
+--On this homework, we worked together for 2 hours;
+--each of us worked separately for 1 hour.
+--Besides addition and multiplication,
+--we implemented other common operations, namely,
+--subtraction, division, exponentiation, factorial, and binomial coefficients, for additional features.
+----------------------
+
 --(integer) division, m divided by n
 dvs :: Int -> Int -> Int
 dvs m n = if n == 0 then -1 else quot m n
@@ -49,6 +59,6 @@ test2_eval :: Bool
 test2_eval = let e = Add (Sub (Exp (Num 8) (Num 7)) (Fac (Num 6))) (Bin (Mul (Num 5) (Num 3)) (Sub (Div (Num 4) (Num 2)) (Num 1))) in
             (eval e) == 2096447
 
---how ARITH expressions are reducted and printed on the screen under GHCi mode
+--how ARITH expressions are evaluated and shown on the screen in GHCi mode; the function defined below is provided to allow more tests to be done in GHCi at your disposal
 instance Show ARITH where
 	show e = show (eval e)
