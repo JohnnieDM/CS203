@@ -59,6 +59,6 @@ test2_eval :: Bool
 test2_eval = let e = Add (Sub (Exp (Num 8) (Num 7)) (Fac (Num 6))) (Bin (Mul (Num 5) (Num 3)) (Sub (Div (Num 4) (Num 2)) (Num 1))) in
             (eval e) == 2096447
 
---how ARITH expressions are evaluated and shown on the screen in GHCi mode; the function defined below is provided to allow more tests to be done in GHCi at your disposal
+--how ARITH expressions are evaluated and shown on the screen in GHCi mode; the function defined below is provided to allow more tests to be done in GHCi at your disposal.
 instance Show ARITH where
 	show e = show (eval e)
