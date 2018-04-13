@@ -1,11 +1,12 @@
 ---------------------
---Program: ARITHinterpreter.hs
---Authors: Johnnie Chang and Wei-Lin Wu
---On this homework, we worked together for 2 hours;
---each of us worked separately for 1 hour.
---Besides addition and multiplication,
---we implemented other common operations, namely,
---subtraction, division, exponentiation, factorial, and binomial coefficients, for additional features.
+-- Program: ARITHinterpreter.hs
+-- Authors: Johnnie Chang and Wei-Lin Wu
+-- On this homework, we worked together for 2 hours;
+-- Johnnie worked independently for 1 hour,
+-- and Wei-Lin worked independently for 1 hour.
+-- Besides addition and multiplication,
+-- we implemented other common operations, namely,
+-- subtraction, division, exponentiation, factorial, and binomial coefficients, for additional features.
 ----------------------
 
 --(integer) division, m divided by n
