@@ -1,4 +1,4 @@
---3.5hrs
+--5hrs
 --Variable can be negatively indexed (to eliminate the use of constructor)
 type Index = Int
 data Variable = V Int deriving Eq
@@ -46,16 +46,23 @@ evalBexp (Or       b1 b2) s = if evalBexp b1 s then True else evalBexp b2 s
 
 --AST of Comm
 data Comm = Skip | Assn Variable Aexp | Comp Comm Comm | IfThenElse Bexp Comm Comm | WhileDo Bexp Comm
+          | RepeatUntil Comm Bexp | ForFromToDo Variable Aexp Aexp Comm
 
 --evaluation of Comm
 evalComm :: Comm -> State -> State
-evalComm Skip                 s = s
-evalComm (Assn v a)           s = \u -> if u == v then evalAexp a s else s u
-evalComm (Comp c1 c2)         s = evalComm c2 (evalComm c1 s)
-evalComm (IfThenElse b c1 c2) s = if evalBexp b s then evalComm c1 s else evalComm c2 s
-evalComm (WhileDo b c)        s = if evalBexp b s then evalComm (Comp c (WhileDo b c)) s else s
-
-
+evalComm Skip                    s = s
+evalComm (Assn v a)              s = \u -> if u == v then evalAexp a s else s u
+evalComm (Comp c1 c2)            s = evalComm c2 (evalComm c1 s)
+evalComm (IfThenElse b c1 c2)    s = if evalBexp b s then evalComm c1 s else evalComm c2 s
+evalComm (WhileDo b c)           s = if evalBexp b s
+	                                     then let s' = evalComm c s in evalComm (WhileDo b c) s'
+										 else s
+evalComm (RepeatUntil c b)       s = let s' = evalComm c s in
+                                     if evalBexp b s' then s' else evalComm (RepeatUntil c b) s'
+evalComm (ForFromToDo (V n) a1 a2 c) s = evalComm (WhileDo (Or (LessThan (Var n) (Num k)) (Equal (Var n) (Num k)))
+                                                           (Comp c (Assn (V n) (Add (Var n) (Num 1)))))
+											      s' where
+	                                     s' = evalComm (Assn (V n) a1) s; k = evalAexp a2 s
 
 
 instance Show Variable where
