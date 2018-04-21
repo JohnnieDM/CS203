@@ -1,20 +1,30 @@
---5hrs
+---------------------
+-- Program: WHILEinterpreter.hs
+-- Authors: Johnnie Chang and Wei-Lin Wu
+-- On this homework, we worked together for 5 hours;
+-- Johnnie worked independently for 2.5 hours,
+-- and Wei-Lin worked independently for 3 hours.
+-- Besides skip, Assignment, composition, if then else, while do,
+-- we implemented other common constructs, namely, repeat until, for from to do, as additional features.
+----------------------
+
+
 --Variable can be negatively indexed (to eliminate the use of constructor)
 type Index = Int
 data Variable = V Int deriving Eq
 type State = Variable -> Int
 
+--sample state 1
 initialState :: State
 initialState v = error "Variable uninitialized!"
 
+--sample state 2
 nullState :: State
 nullState v = 0
 
 --AST of Aexp
---TORESOLVE: why I used deriving Eq
 data Aexp = Num Int | Var Index | Add Aexp Aexp | Sub Aexp Aexp | Mul Aexp Aexp
             | Div Aexp Aexp | Exp Aexp Aexp | Fac Aexp | Bin Aexp Aexp
-			deriving Eq
 
 --evaluation of Aexp
 evalAexp :: Aexp -> State -> Int
@@ -29,10 +39,8 @@ evalAexp (Fac a)     s = fac (evalAexp a s)
 evalAexp (Bin a1 a2) s = bin (evalAexp a1 s) (evalAexp a2 s)
 
 --AST of Bexp
---TORESOLVE: why I used deriving Eq
 data Bexp = T | F | Equal Aexp Aexp | LessThan Aexp Aexp
             | Not Bexp | And Bexp Bexp | Or Bexp Bexp
-			deriving Eq
 
 --evaluation of Bexp (And, Or shortcircuited)
 evalBexp :: Bexp -> State -> Bool
@@ -64,7 +72,24 @@ evalComm (ForFromToDo (V n) a1 a2 c) s = evalComm (WhileDo (Or (LessThan (Var n)
 											      s' where
 	                                     s' = evalComm (Assn (V n) a1) s; k = evalAexp a2 s
 
+--begin comment, below are test cases
+test_program :: Comm
+test_program = Comp (Assn (V 0) (Num 1)) (WhileDo (LessThan (Var 0) (Num 5)) (Comp (Comp (Comp (Comp ((Assn (V 1) (Var 0))) ((Assn (V 2) (Num 3)))) (ForFromToDo (V 3) (Num 1) (Var 2) (Assn (V 0) (Add (Var 0) (Var 0))))) (IfThenElse (LessThan (Var 0) (Mul (Var 2) (Var 1))) (Assn (V 0) (Add (Var 1) (Num 10))) (RepeatUntil (Assn (V 0) (Sub (Var 0) (Num 1))) (LessThan (Var 0) (Mul (Var 2) (Var 1)))))) Skip))
 
+test_case1 :: Bool
+test_case1 = (evalComm test_program nullState) (V 0) == 5
+
+test_case2 :: Bool
+test_case2 = (evalComm test_program nullState) (V 1) == 2
+
+test_case3 :: Bool
+test_case3 = (evalComm test_program nullState) (V 2) == 3
+
+test_case4 :: Bool
+test_case4 = (evalComm test_program nullState) (V 3) == 4
+--end comment
+
+--make varible printable on the screen in GHCi mode
 instance Show Variable where
 	show (V n) = "V " ++ show n
 
@@ -76,7 +101,6 @@ dvs m n
  | otherwise = error "Division by 0!"
 
 --power (exponential), m^n
---TORESOLVE, error
 pow :: Int -> Int -> Int
 pow m n
  | n == 0    = 1
@@ -84,7 +108,6 @@ pow m n
  | otherwise = error "Negative power!"
 
 --factorial, n!
---TORESOLVE, error
 fac :: Int -> Int
 fac n
  | n == 0 = 1
@@ -92,7 +115,6 @@ fac n
  | otherwise = error "Factorial on negative interger!"
 
 --binomial coefficient, m choose n
---TORESOLVE, error
 bin :: Int -> Int -> Int
 bin m n
  | m == 0, n == 0        = 1
