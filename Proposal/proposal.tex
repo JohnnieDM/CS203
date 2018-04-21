@@ -1,0 +1,22 @@
+\documentclass{report}
+
+\usepackage{amssymb}
+
+\begin{document}
+In theorectical computer science, there have been many computational models proposed to study computability and complexity that are equivalent to one another in terms of computational power. Two best-known models are Turing machine and $\lambda$-calculus. A lesser-known third model called \emph{register machine} is used to discuss Halting Problem and other decidability problems in the textbook Mathematical Logic by H.-D.\ Ebbinghaus, J.\ Flum and W.\ Thomas.
+\medskip\\
+A register machine associated with a fixed alphabet $\mathcal{A} = \{a_0, \ldots, a_r\}$ has countably many registers, each of which can store a string over $\mathcal{A}$ of arbitrary (finite) length.
+\medskip\\
+A program for a register machine with alphabet $\mathcal{A}$ is a finite nonempty sequence of instructions that each take one of the forms below:
+\begin{itemize}
+\item $L$ LET $\mathrm{R}_i = \mathrm{R}_i + a_j$, where $L, i, j \in \mathbb{N}$ and $j \leq r$ (Add-instruction: Add the letter $a_j$ at the end of the string in register $mathrm{R}_i$);
+\item $L$ LET $\mathrm{R}_i = \mathrm{R}_i - a_j$, where $L, i, j \in \mathbb{N}$ and $j \leq r$ (Subtract-instruction: If the string in register $\mathrm{R}_i$ ends with the letter $a_j$, delete this $a_j$; otherwise leave the word unchanged);
+\item $L$ IF $\mathrm{R}_i = \epsilon$ THEN $L'$ ELSE $L_0$ OR \ldots OR $L_r$, for $L, i, L', L_0, \ldots , L_r \in \mathbb{N}$, where $\epsilon$ denotes the empty string (Jump-instruction: If register $\mathrm{R}_i$ contains the empty string go to instruction labelled $L'$; if the string in register $\mathrm{R}_i$ ends with $a_0$ (or $a_1, \ldots, a_r$, respectively) go to instruction labelled $L_0$ (or $L_1, \ldots, L_r$, respectively));
+\item $L$ PRINT, for $L \in \mathbb{N}$ (Print-instruction: Print as output the string stored in register
+$R_0$);
+\item $L$ HALT, for $L \in \mathbb{N}$ (Halt-instruction: Halt).
+\end{itemize}
+In a program of length $n + 1$, the prefixing labels of instructions enumerate $0, 1, 2, \ldots, n$, every jump instruction refers to labels no greater than $n$, and only the last instruction is a halt instruction.
+\medskip\\
+Motivation. We have found this textbook an excellent reference for mathematical logic, and would like to write a register-machine interpreter in Haskell to run the programs given in this book for a deeper level of understanding and to experiment our ideas concerning the compuatioal model of register machine.
+\end{document}
