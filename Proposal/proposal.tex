@@ -1,13 +1,38 @@
-\documentclass{report}
-
+\documentclass[english]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{40pt} 
 
 \begin{document}
-In theorectical computer science, there have been many computational models proposed to study computability and complexity that are equivalent to one another in terms of computational power. Two best-known models are Turing machine and $\lambda$-calculus. A lesser-known third model called \emph{register machine} is used to discuss Halting Problem and other decidability problems in the textbook Mathematical Logic by H.-D.\ Ebbinghaus, J.\ Flum and W.\ Thomas.
+
+\title{Project Proposal: Register Machine Interpreter}
+
+\author{Wei-Lin Wu and Johnnie Chang}
+
+\maketitle
+\thispagestyle{fancy}
+
+
+\section{Background}
+In theoretical computer science, there have been many computational models proposed 
+to study computability and complexity that are equivalent to one another in terms of computational power. 
+Two best-known models are Turing machine and $\lambda$-calculus. 
+\emph{Register machine}, a lesser known model is put forth to discuss the Halting Problem 
+%A lesser-known third model called \emph{register machine} is used to discuss Halting Problem 
+and other decidability problems in the book Mathematical Logic by H.-D.\ Ebbinghaus, J.\ Flum and W.\ Thomas.
 \medskip\\
-A register machine associated with a fixed alphabet $\mathcal{A} = \{a_0, \ldots, a_r\}$ has countably many registers, each of which can store a string over $\mathcal{A}$ of arbitrary (finite) length.
+A register machine is associated with a fixed alphabet $\mathcal{A} = \{a_0, \ldots, a_r\}$ and has countably many registers, 
+each of which can store a string over $\mathcal{A}$ of an arbitrary (finite) length.
 \medskip\\
-A program for a register machine with alphabet $\mathcal{A}$ is a finite nonempty sequence of instructions that each take one of the forms below:
+A program for a register machine with alphabet $\mathcal{A}$ is a finite nonempty sequence of instructions that each takes one of the forms below:
 \begin{itemize}
 \item $L$ LET $\mathrm{R}_i = \mathrm{R}_i + a_j$, where $L, i, j \in \mathbb{N}$ and $j \leq r$ (Add-instruction: Add the letter $a_j$ at the end of the string in register $mathrm{R}_i$);
 \item $L$ LET $\mathrm{R}_i = \mathrm{R}_i - a_j$, where $L, i, j \in \mathbb{N}$ and $j \leq r$ (Subtract-instruction: If the string in register $\mathrm{R}_i$ ends with the letter $a_j$, delete this $a_j$; otherwise leave the word unchanged);
@@ -16,7 +41,18 @@ A program for a register machine with alphabet $\mathcal{A}$ is a finite nonempt
 $R_0$);
 \item $L$ HALT, for $L \in \mathbb{N}$ (Halt-instruction: Halt).
 \end{itemize}
-In a program of length $n + 1$, the prefixing labels of instructions enumerate $0, 1, 2, \ldots, n$, every jump instruction refers to labels no greater than $n$, and only the last instruction is a halt instruction.
-\medskip\\
-Motivation. We have found this textbook an excellent reference for mathematical logic, and would like to write a register-machine interpreter in Haskell to run the programs given in this book for a deeper level of understanding and to experiment our ideas concerning the compuatioal model of register machine.
+In a program of length $n + 1$, the prefixing labels of instructions enumerate over $0, 1, 2, \ldots, n$, 
+every jump instruction refers to labels no greater than $n$, and only the last instruction is a halt instruction.
+%\medskip\\
+\section{Goal and Motivation}
+We have found this book an excellent reference for mathematical logic, 
+and would like to write a register-machine interpreter in Haskell 
+to run the programs given in this book for a deeper level of understanding 
+and to experiment our ideas concerning the compuatioal model of register machine.
+%
+%
+\section{Work Schedule and Risk Assessment}
+
+
+
 \end{document}
