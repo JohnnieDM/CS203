@@ -9,6 +9,10 @@
 -- rather than a function from variable to int. This is much more efficient than our earlier implementation.
 -- We also changed the representation of variable as indexed by int to one as indexed/recognized by string.
 -- When displayed on the screen, the variables are surrounded by double quotes (so that "1" is a variable).
+-- Finally, we fixed the semantics of WhileDo, RepeatUntil, and ForFromToDo based on their respective
+-- recursive structure with IfThenElse (so that each of their semantics is expressed through itself and
+-- the semantics of IfThenElse).
+-- You're welcome to use both evalComm and evalCommSeq to check the correctness of our program.
 --
 -- Please use putStrLn when testing in terminal as this correctly displays the newline characters ('\n'), i.e.
 -- displaying a new line instead of literally backslash n.
@@ -124,10 +128,11 @@ evalCommOneStep ((Comp Skip c),               s) = (c, s)
 evalCommOneStep ((Comp nonSkip c),            s) = ((Comp c' c), s') where (c', s') = evalCommOneStep (nonSkip, s)
 evalCommOneStep ( IfThenElse b c1 c2,         s) = if (evalBexp b s) then (c1, s) else (c2, s) 
 evalCommOneStep ((WhileDo b c),               s) = (IfThenElse b (Comp c (WhileDo b c)) Skip, s)
-evalCommOneStep ((RepeatUntil c b),           s) = (Comp c (IfThenElse (Not b) (RepeatUntil c b) Skip), s)
+evalCommOneStep ((RepeatUntil c b),           s) = (Comp c (IfThenElse b Skip (RepeatUntil c b)), s)
 evalCommOneStep ((ForFromToDo (V i) a1 a2 c), s) = (Comp (Assn (V i) (Num m))
-                                                         (WhileDo (Or (LessThan (Var i) (Num n)) (Equal (Var i) (Num n)))
-														          (Comp c (Assn (V i) (Add (Var i) (Num 1))))),
+                                                         (IfThenElse (Or (LessThan (Var i) (Num n)) (Equal (Var i) (Num n)))
+														             (Comp c (ForFromToDo (V i) (Add (Var i) (Num 1)) (Num n) c))
+																	  Skip),
 												   s)
                                                    where m = evalAexp a1 s; n = evalAexp a2 s
 
@@ -149,15 +154,14 @@ evalComm  Skip                       s = s
 evalComm (Assn (V i) a)              s = let n = evalAexp a s in insert i n s
 evalComm (Comp c1 c2)                s = evalComm c2 (evalComm c1 s)
 evalComm (IfThenElse b c1 c2)        s = if evalBexp b s then evalComm c1 s else evalComm c2 s
-evalComm (WhileDo b c)               s = if evalBexp b s
-	                                         then let s' = evalComm c s in evalComm (WhileDo b c) s'
-										     else s
-evalComm (RepeatUntil c b)           s = let s' = evalComm c s in
-                                         if evalBexp b s' then s' else evalComm (RepeatUntil c b) s'
-evalComm (ForFromToDo (V i) a1 a2 c) s = evalComm (WhileDo (Or (LessThan (Var i) (Num n)) (Equal (Var i) (Num n)))
-                                                           (Comp c (Assn (V i) (Add (Var i) (Num 1)))))
-											      s'
-										 where s' = evalComm (Assn (V i) a1) s; n = evalAexp a2 s
+evalComm (WhileDo b c)               s = evalComm (IfThenElse b (Comp c (WhileDo b c)) Skip) s
+evalComm (RepeatUntil c b)           s = evalComm (Comp c (IfThenElse b Skip (RepeatUntil c b))) s
+evalComm (ForFromToDo (V i) a1 a2 c) s = evalComm (Comp (Assn (V i) (Num m))
+                                                        (IfThenElse (Or (LessThan (Var i) (Num n)) (Equal (Var i) (Num n)))
+														   (Comp c (ForFromToDo (V i) (Add (Var i) (Num 1)) (Num n) c))
+														    Skip)
+												  ) s
+                                         where m = evalAexp a1 s; n = evalAexp a2 s
 
 
 
