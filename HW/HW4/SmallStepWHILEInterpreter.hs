@@ -5,8 +5,8 @@
 -- Johnnie worked independently for 4 hours,
 -- and Wei-Lin worked independently for 5 hours.
 -- This program modifies the one for HW 2.
--- Based on the feedback from TA on HW 2, we reimplementated states using hash map from string to int rather than
--- a function from variable to int. This is much more efficient than our earlier implementation.
+-- Based on the feedback from TA on HW 2, we reimplementated states using hash map from string to int,
+-- rather than a function from variable to int. This is much more efficient than our earlier implementation.
 -- We also changed the representation of variable as indexed by int to one as indexed/recognized by string.
 -- When displayed on the screen, the variables are surrounded by double quotes (so that "1" is a variable).
 --
