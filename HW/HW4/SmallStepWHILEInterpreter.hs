@@ -203,3 +203,10 @@ bin m n
  | m > 0, n >= 0, n <= m = (fac m) `quot` ((fac (m - n)) * (fac n))
  | m > 0, n > m          = 0
  | otherwise             = error "Binomial on negative integer(s)!"
+
+--sum from 1 to n
+series_sum :: Int -> Int
+series_sum n
+ | n == 0    = 0
+ | n > 0     = n + series_sum (n - 1)
+ | otherwise = error "Negative series sum!"
