@@ -20,12 +20,12 @@ prog :: Program
 prog = [BRANCH 0 [7, 1, 4], SUB 0 'a', ADD 1 'b', BRANCH 0 [7, 1, 4], SUB 0 'b', ADD 1 'a', BRANCH 0 [7, 1, 4], HALT]
 
 rvrs :: Program
-rvrs = [BRANCH 0 [7, 1, 4], SUB 0 'a', ADD 1 'a', BRANCH 0 [7, 1, 4], SUB 0 'b', ADD 1 'b', BRANCH 0 [7, 1, 4], BRANCH 1 [14, 8, 11], SUB 1 'a', ADD 2 'a', BRANCH 1 [14, 8, 11], SUB 1 'b', ADD 2 'b', BRANCH 1 [14, 8, 11], BRANCH 2 [21, 15, 18], SUB 2 'a', ADD 0 'a', BRANCH 2 [21, 15, 18], SUB 2 'b', ADD 0 'b', BRANCH 2 [21, 15, 18], HALT]
+rvrs = [BRANCH 0 [7, 1, 4], SUB 0 'a', ADD 1 'a', BRANCH 0 [7, 1, 4], SUB 0 'b', ADD 1 'b', BRANCH 0 [7, 1, 4], BRANCH 1 [14, 8, 11], SUB 1 'a', ADD 2 'a', BRANCH 1 [14, 8, 11], SUB 1 'b', ADD 2 'b', BRANCH 1 [14, 8, 11], BRANCH 2 [21, 15, 18], SUB 2 'a', ADD 0 'a', BRANCH 2 [21, 15, 18], SUB 2 'b', ADD 0 'b', BRANCH 2 [21, 15, 18], PRINT, HALT]
 
 position :: Symbol -> Alphabet -> Index
 position s a = head ([i | (i, char) <- zip [1 .. ] a, s == char] ++ [length a + 1])
 
-evalProg :: Program -> RegMap -> ProgCntr -> Output -> (RegMap, ProgCntr)
+evalProg :: Program -> RegMap -> ProgCntr -> Output -> ((RegMap, ProgCntr), Output)
 evalProg p rmap i o = case p !! i of
                         ADD k s -> if member k rmap
                                      then evalProg p (insert k ((rmap ! k) ++ (s : [])) rmap) (i + 1) o
@@ -45,7 +45,15 @@ evalProg p rmap i o = case p !! i of
                         PRINT -> if member 0 rmap
                                    then let reg = rmap ! 0 in evalProg p rmap (i + 1) (o ++ reg)
                                    else evalProg p (insert 0 "" rmap) (i + 1) o 
-                        HALT -> (rmap, i + 1)
+                        HALT -> ((rmap, i + 1), o)
 
 exec :: Program -> Input -> Output
-exec p c = (fst (evalProg p (insert 0 c empty) 0 "")) ! 0
+exec p c = snd (evalProg p (insert 0 c empty) 0 "")
+
+{-
+alpha0 :: Alphabet
+alpha0 = "aBeHkmprSuy !^_"
+
+onemorething :: Program
+onemorething = [ADD 0 'H',ADD 0 'a',ADD 0 'p',ADD 0 'p',ADD 0 'y',ADD 0 ' ',ADD 0 'S',ADD 0 'u',ADD 0 'm',ADD 0 'm',ADD 0 'e',ADD 0 'r',ADD 0 ' ',ADD 0 'B',ADD 0 'r',ADD 0 'e',ADD 0 'a',ADD 0 'k',ADD 0 '!',ADD 0 ' ',ADD 0 '^',ADD 0 '_',ADD 0 '^',ADD 0 'y',PRINT,HALT]
+-}
