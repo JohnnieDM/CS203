@@ -7,68 +7,48 @@ import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as Token
 
---data BExpr = BoolConst Bool
---           | Not BExpr
---           | BBinary BBinOp BExpr BExpr
---           | RBinary RBinOp AExpr AExpr
+import Data.HashMap
+
+--data Stmt = Seq [Stmt]
+--          | Add RExpr Char
+--          | Sub RExpr Char
+--          | IfEmpty RExpr Then LExpr Else LExpr Or LExpr
+--          | Print
+--          | Halt
 --            deriving (Show)
---data BBinOp = And | Or deriving (Show)
---data RBinOp = Greater | Less deriving (Show)
 
---data AExpr = Var String
---           | IntConst Integer
---           | Neg AExpr
---           | ABinary ABinOp AExpr AExpr
---             deriving (Show)
+type Index = Int
+--type Index = String
+type Symbol = Char
+type Alphabet = [Symbol]
+type Label = Int
+--type Label = String
+type RegCont = String
+type Input = RegCont
+type Output = RegCont
+type Program = [Instr]
+type ProgCntr = Index
+type RegMap = Map Index RegCont
+type ProgCnt = Int
 
---data ABinOp = Add
---            | Subtract
---            | Multiply
---            | Divide
---              deriving (Show)
-
--- Character expression
-data CExpr = Var Char
-
--- Register expression TODO: want "R"integer
-data RExpr = 
-
-data Stmt = Seq [Stmt]
---          | Assign String AExpr
-          | Add RExpr Char
-          | Sub RExpr Char
---          | If BExpr Stmt Stmt
-          | IfEmpty RExpr Then Lbl Else Lbl Or Lbl
---          | While BExpr Stmt
---          | Skip
-          | Print
-          | Hault
-            deriving (Show)
+data Instr = Seq [Instr]
+           | ADD Index Symbol
+           | SUB Index Symbol
+           | BRANCH Index [Label]
+           | PRINT
+           | HALT
+             deriving (Eq)
 
 languageDef =
-  emptyDef { --Token.commentStart    = "/*"
-           --, Token.commentEnd      = "*/"
-           --, Token.commentLine     = "//"
-           , Token.identStart      = letter
+  emptyDef { Token.identStart      = char 'R' <|> char 'L'
            , Token.identLetter     = alphaNum
            , Token.reservedNames   = [ "IFEMPTY"
                                      , "THEN"
                                      , "ELSE"
                                      , "OR"
                                      , "LET"
-           --                          , "while"
-           --                          , "do"
-           --                          , "skip"
-           --                          , "true"
-           --                          , "false"
-           --                          , "not"
-           --                          , "and"
-           --                          , "or"
                                      ]
-           , Token.reservedOpNames = [--"+", "-", "*", "/", ":="
-                                      --, "<", ">", "and", "or", "not"
-                                      "+=", "-="
-                                     ]
+           , Token.reservedOpNames = ["+=", "-="]
            }
 
 lexer = Token.makeTokenParser languageDef
@@ -84,132 +64,84 @@ integer    = Token.integer    lexer -- parses an integer
 semi       = Token.semi       lexer -- parses a semicolon
 whiteSpace = Token.whiteSpace lexer -- parses whitespace
 
-whileParser :: Parser Stmt
-whileParser = whiteSpace >> statement
+--whileParser :: Parser Stmt
+--whileParser = whiteSpace >> statement
+--statement :: Parser Stmt
+--statement =   parens statement
+--          <|> sequenceOfStmt
+--sequenceOfStmt =
+--  do list <- (sepBy1 statement' semi)
+--     -- If there's only one statement return it without using Seq.
+--     return $ if length list == 1 then head list else Seq list
+--statement' :: Parser Stmt
+--statement' =   ifStmt
+--           <|> addStmt
+--           <|> subStmt
+--           <|> haltStmt
+--           <|> printStmt
 
-statement :: Parser Stmt
-statement =   parens statement
-          <|> sequenceOfStmt
+rmParser :: Parser Instr
+rmParser = whiteSpace >> instruction
 
-sequenceOfStmt =
-  do list <- (sepBy1 statement' semi)
+instruction :: Parser Instr
+instruction =  sequenceOfInstr
+
+sequenceOfInstr =
+  do list <- (sepBy1 instruction' semi)
      -- If there's only one statement return it without using Seq.
      return $ if length list == 1 then head list else Seq list
 
-statement' :: Parser Stmt
-statement' =   ifStmt
---           <|> whileStmt
---           <|> skipStmt
---           <|> assignStmt
-           <|> addStmt
-           <|> subStmt
+instruction' :: Parser Instr
+instruction' =   ifInstr
+             <|> addInstr
+             <|> subInstr
+             <|> haltInstr
+             <|> printInstr
 
-ifStmt :: Parser Stmt
-ifStmt =
---  do reserved "if"
---     cond  <- bExpression
---     reserved "then"
---     stmt1 <- statement
---     reserved "else"
---     stmt2 <- statement
---     return $ If cond stmt1 stmt2
+ifInstr :: Parser Instr
+ifInstr =
   do reserved "IFEMPTY"
-     register  <- rExpression
+     register  <- identifier -- TODO: read identifier "R0" into integer 0
      reserved "THEN"
-     label1 <- statement
+     label1 <- identifier -- TOOD: read idintifer "L1" into integer 1
      reserved "ELSE"
-     label2 <- statement
+     label2 <- identifier -- TOOD: same
      reserved "OR"
-     label3 <- statement
-     return $ IfEmpty register Then label1 Else label2 Or label3
+     label3 <- identifier -- TODO: same
+     return $ BRANCH register [label1 label2 label3]
 
---whileStmt :: Parser Stmt
---whileStmt =
---  do reserved "while"
---     cond <- bExpression
---     reserved "do"
---     stmt <- statement
---     return $ While cond stmt
-
---assignStmt :: Parser Stmt
---assignStmt =
---  do var  <- identifier
---     reservedOp ":="
---     expr <- aExpression
---     return $ Assign var expr
-
-addStmt :: Parser Stmt
-addStmt =
+addInstr :: Parser Instr
+addInstr =
   do reserved "LET"
-     register <- rExpression
+     register <- identifier
      reservedOp "+="
-     char <- aExpression -- TODO: want char, not aExpression
-     return $ Add register char
+     symbol <- identifier
+     return $ ADD register symbol
 
-subStmt :: Parser Stmt
-subStmt =
+subInstr :: Parser Instr
+subInstr =
   do reserved "LET"
-     register <- rExpression
+     register <- identifier
      reservedOp "-="
-     char <- aExpression
-     return $ Sub register char
+     symbol <- identifier
+     return $ SUB register symbol
 
---skipStmt :: Parser Stmt
---skipStmt = reserved "skip" >> return Skip
+haltInstr :: Parser Instr
+haltInstr = reserved "HALT" >> return HALT
 
-haultStmt :: Parser Stmt
-haultStmt = reserved "HAULT" >> return Hault
+printInstr :: Parser Instr
+printInstr = reserved "PRINT" >> return PRINT
 
--- Register expression (not relational expression)
-rExpression :: Parser RExpr
-rExpression = buildExpressionParser "R" -- TODO how do I do this?...
-
---aExpression :: Parser AExpr
---aExpression = buildExpressionParser aOperators aTerm
-
---bExpression :: Parser BExpr
---bExpression = buildExpressionParser bOperators bTerm
-
---aOperators = [ [Prefix (reservedOp "-"   >> return (Neg             ))          ]
---             , [Infix  (reservedOp "*"   >> return (ABinary Multiply)) AssocLeft,
---                Infix  (reservedOp "/"   >> return (ABinary Divide  )) AssocLeft]
---             , [Infix  (reservedOp "+"   >> return (ABinary Add     )) AssocLeft,
---                Infix  (reservedOp "-"   >> return (ABinary Subtract)) AssocLeft]
---              ]
-
---bOperators = [ [Prefix (reservedOp "not" >> return (Not             ))          ]
---             , [Infix  (reservedOp "and" >> return (BBinary And     )) AssocLeft,
---                Infix  (reservedOp "or"  >> return (BBinary Or      )) AssocLeft]
---             ]
-
---aTerm =  parens aExpression
---     <|> liftM Var identifier
---     <|> liftM IntConst integer
-
---bTerm =  parens bExpression
---     <|> (reserved "true"  >> return (BoolConst True ))
---     <|> (reserved "false" >> return (BoolConst False))
---     <|> rExpression
-
---rExpression =
---  do a1 <- aExpression
---     op <- relation
---     a2 <- aExpression
---     return $ RBinary op a1 a2
-
---relation =   (reservedOp ">" >> return Greater)
---         <|> (reservedOp "<" >> return Less)
-
-parseString :: String -> Stmt
+parseString :: String -> Instr
 parseString str =
-  case parse whileParser "" str of
+  case parse rmParser "" str of
     Left e  -> error $ show e
     Right r -> r
 
-parseFile :: String -> IO Stmt
+parseFile :: String -> IO Instr
 parseFile file =
   do program  <- readFile file
-     case parse whileParser "" program of
+     case parse rmParser "" program of
        Left e  -> print e >> fail "parse error"
        Right r -> return r
 
