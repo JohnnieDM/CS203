@@ -17,12 +17,12 @@ import Data.HashMap
 --          | Halt
 --            deriving (Show)
 
-type Index = Int
---type Index = String
+--type Index = Int
+type Index = Integer
 type Symbol = Char
 type Alphabet = [Symbol]
-type Label = Int
---type Label = String
+--type Label = Int
+type Label = Integer
 type RegCont = String
 type Input = RegCont
 type Output = RegCont
@@ -40,7 +40,7 @@ data Instr = Seq [Instr]
              deriving (Eq)
 
 languageDef =
-  emptyDef { Token.identStart      = char 'R' <|> char 'L'
+  emptyDef { Token.identStart      = char 'R'
            , Token.identLetter     = alphaNum
            , Token.reservedNames   = [ "IFEMPTY"
                                      , "THEN"
@@ -53,32 +53,17 @@ languageDef =
 
 lexer = Token.makeTokenParser languageDef
 
-identifier = Token.identifier lexer -- parses an identifier
-reserved   = Token.reserved   lexer -- parses a reserved name
-reservedOp = Token.reservedOp lexer -- parses an operator
-parens     = Token.parens     lexer -- parses surrounding parenthesis:
+identifier = Token.identifier  lexer -- parses an identifier
+reserved   = Token.reserved    lexer -- parses a reserved name
+reservedOp = Token.reservedOp  lexer -- parses an operator
+parens     = Token.parens      lexer -- parses surrounding parenthesis:
                                     --   parens p
                                     -- takes care of the parenthesis and
                                     -- uses p to parse what's inside them
-integer    = Token.integer    lexer -- parses an integer
-semi       = Token.semi       lexer -- parses a semicolon
-whiteSpace = Token.whiteSpace lexer -- parses whitespace
-
---whileParser :: Parser Stmt
---whileParser = whiteSpace >> statement
---statement :: Parser Stmt
---statement =   parens statement
---          <|> sequenceOfStmt
---sequenceOfStmt =
---  do list <- (sepBy1 statement' semi)
---     -- If there's only one statement return it without using Seq.
---     return $ if length list == 1 then head list else Seq list
---statement' :: Parser Stmt
---statement' =   ifStmt
---           <|> addStmt
---           <|> subStmt
---           <|> haltStmt
---           <|> printStmt
+integer    = Token.integer     lexer -- parses an integer
+charLit    = Token.charLiteral lexer -- parses an char literal
+semi       = Token.semi        lexer -- parses a semicolon
+whiteSpace = Token.whiteSpace  lexer -- parses whitespace
 
 rmParser :: Parser Instr
 rmParser = whiteSpace >> instruction
@@ -101,29 +86,32 @@ instruction' =   ifInstr
 ifInstr :: Parser Instr
 ifInstr =
   do reserved "IFEMPTY"
-     register  <- identifier -- TODO: read identifier "R0" into integer 0
+     --register  <- identifier -- TODO: read identifier "R0" into integer 0
+     register  <- integer
      reserved "THEN"
-     label1 <- identifier -- TOOD: read idintifer "L1" into integer 1
+     label1 <- integer
      reserved "ELSE"
-     label2 <- identifier -- TOOD: same
+     label2 <- integer
      reserved "OR"
-     label3 <- identifier -- TODO: same
-     return $ BRANCH register [label1 label2 label3]
+     label3 <- integer
+     return $ BRANCH register [label1, label2, label3]
 
 addInstr :: Parser Instr
 addInstr =
   do reserved "LET"
-     register <- identifier
+     --register <- identifier
+     register <- integer
      reservedOp "+="
-     symbol <- identifier
+     symbol <- charLit
      return $ ADD register symbol
 
 subInstr :: Parser Instr
 subInstr =
   do reserved "LET"
-     register <- identifier
+     --register <- identifier
+     register <- integer
      reservedOp "-="
-     symbol <- identifier
+     symbol <- charLit
      return $ SUB register symbol
 
 haltInstr :: Parser Instr
