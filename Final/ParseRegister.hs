@@ -1,5 +1,4 @@
-module ParseWhile where
-
+import System.Environment
 import System.IO
 import Control.Monad
 import Text.ParserCombinators.Parsec
@@ -9,25 +8,25 @@ import qualified Text.ParserCombinators.Parsec.Token as Token
 
 import Data.HashMap
 
-type Index = Integer
-type Symbol = Char
+type Index    = Integer
+type Symbol   = Char
 type Alphabet = [Symbol]
-type Label = Integer
-type RegCont = String
-type Input = RegCont
-type Output = RegCont
-type Program = [Instr]
+type Label    = Integer
+type RegCont  = String
+type Input    = RegCont
+type Output   = RegCont
+type Program  = [Instr]
 type ProgCntr = Index
-type RegMap = Map Index RegCont
-type ProgCnt = Integer
+type RegMap   = Map Index RegCont
+type ProgCnt  = Integer
 
 data Instr = Seq [Instr]
            | ADD Index Symbol
            | SUB Index Symbol
-           | BRANCH Index [Label]
+           | JUMP Index [Label]
            | PRINT
            | HALT
-             deriving (Eq, Show)
+             deriving (Eq)
 
 alpha :: Alphabet
 alpha = "ab"
@@ -46,7 +45,7 @@ evalProg p rmap i o = case p !! fromInteger i of
                                          then evalProg p (insert k (take (length reg - 1) reg) rmap) (i + 1) o
                                          else evalProg p rmap (i + 1) o
                                      else evalProg p (insert k (s : []) rmap) (i + 1) o
-                        BRANCH k l -> if member k rmap
+                        JUMP k l -> if member k rmap
                                         then let reg = rmap ! k in
                                           if length reg == 0
                                             then evalProg p rmap (l !! 0) o
@@ -122,7 +121,7 @@ instruction' =   ifInstr
 --     label1 <- natural
 --     reserved "ELSE"
 --     something
---     return $ BRANCH register something
+--     return $ JUMP register something
 
 ifInstr :: Parser Instr
 ifInstr =
@@ -136,7 +135,7 @@ ifInstr =
      label2 <- natural
      reserved "OR"
      label3 <- natural
-     return $ BRANCH register [label1, label2, label3]
+     return $ JUMP register [label1, label2, label3]
 
 addInstr :: Parser Instr
 addInstr =
@@ -177,4 +176,27 @@ parseFile file =
        Left e  -> print e >> fail "parse error"
        Right r -> return r
 
+par :: String -> [Instr]
+par str =
+  case parse rmParser "" str of
+    Left e  -> error $ show e
+    Right r -> case r of
+                 ADD _ _ -> [PRINT]
+                 SUB _ _ -> [PRINT]
+                 JUMP _ _ -> [PRINT]
+                 PRINT -> [PRINT]
+                 HALT -> [PRINT]
+                 Seq s -> s
 
+main =
+  do [file] <- getArgs
+     program <- readFile file
+     case parse rmParser "" program of
+       Left e  -> print e >> fail "parse error"
+       Right r -> case r of
+                    ADD _ _ -> print "" >> fail "No HALT!"
+                    SUB _ _ -> print "" >> fail "No HALT!"
+                    JUMP _ _ -> print "" >> fail "No HALT!"
+                    PRINT -> print "" >> fail "No HALT!"
+                    HALT -> print (exec [HALT] "")
+                    Seq s -> print (exec s "")
