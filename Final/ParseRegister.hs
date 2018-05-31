@@ -177,7 +177,7 @@ parseFile file =
        Right r -> return r
 
 main =
-  do [file] <- getArgs
+  do [file, input] <- getArgs
      program <- readFile file
      case parse rmParser "" program of
        Left e  -> print e >> fail "parse error"
@@ -187,4 +187,4 @@ main =
                     JUMP _ _ -> print "" >> fail "No HALT!"
                     PRINT -> print "" >> fail "No HALT!"
                     HALT -> print (exec [HALT] "")
-                    Seq s -> print (exec s "")
+                    Seq s -> print (exec s input)
