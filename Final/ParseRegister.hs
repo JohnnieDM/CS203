@@ -176,18 +176,6 @@ parseFile file =
        Left e  -> print e >> fail "parse error"
        Right r -> return r
 
-par :: String -> [Instr]
-par str =
-  case parse rmParser "" str of
-    Left e  -> error $ show e
-    Right r -> case r of
-                 ADD _ _ -> [PRINT]
-                 SUB _ _ -> [PRINT]
-                 JUMP _ _ -> [PRINT]
-                 PRINT -> [PRINT]
-                 HALT -> [PRINT]
-                 Seq s -> s
-
 main =
   do [file] <- getArgs
      program <- readFile file
