@@ -27,7 +27,7 @@ data Instr = Seq [Instr]
            | BRANCH Index [Label]
            | PRINT
            | HALT
-             deriving (Eq)
+             deriving (Eq, Show)
 
 alpha :: Alphabet
 alpha = "ab"
