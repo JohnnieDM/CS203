@@ -101,8 +101,8 @@ sequenceOfInstr =
 
 instruction' :: Parser Instr
 instruction' =   ifInstr
+             <|> try subInstr
              <|> addInstr
-             <|> subInstr
              <|> haltInstr
              <|> printInstr
 
