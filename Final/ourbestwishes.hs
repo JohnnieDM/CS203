@@ -205,24 +205,24 @@ evalProgStepwise :: Program -> RegArray -> Label -> Output -> Trace
 evalProgStepwise program regarray label output =
   case program `instrLabeled` label of
     ADD ind symb    -> let ((newregarray, nextlabel), newoutput) = evalInstr (ADD ind symb) regarray label output in
-                         "Execute " ++ show label ++ " " ++ show (ADD ind symb) ++
+                         "Execute instruction labeled " ++ show label ++ ": " ++ show (ADD ind symb) ++
                          "\nwith register(s): " ++ showRegArray regarray ++
                          "\n\n" ++ evalProgStepwise program newregarray nextlabel newoutput
     SUB ind symb    -> let ((newregarray, nextlabel), newoutput) = evalInstr (SUB ind symb) regarray label output in
-                         "Execute " ++ show label ++ " " ++ show (SUB ind symb) ++
+                         "Execute instruction labeled " ++ show label ++ ": " ++ show (SUB ind symb) ++
                          "\nwith register(s): " ++ showRegArray regarray ++
                          "\n\n" ++ evalProgStepwise program newregarray nextlabel newoutput
     JUMP ind labels -> let ((newregarray, nextlabel), newoutput) = evalInstr (JUMP ind labels) regarray label output in
-                         "Execute " ++ show label ++ " " ++ show (JUMP ind labels) ++
+                         "Execute instruction labeled " ++ show label ++ ": " ++ show (JUMP ind labels) ++
                          "\nwith register(s): " ++ showRegArray regarray  ++
                          "\n\n" ++ evalProgStepwise program newregarray nextlabel newoutput
     PRINT           -> let ((newregarray, nextlabel), newoutput) = evalInstr PRINT regarray label output in
-                         "Execute " ++ show label ++ " " ++ show PRINT ++
+                         "Execute instruction labeled " ++ show label ++ ": " ++ show PRINT ++
                          "\nwith register(s): " ++ showRegArray regarray ++
                          "\n\nCurrent output: \"" ++ newoutput ++ "\"\n\n" ++ 
                          evalProgStepwise program newregarray nextlabel newoutput
     HALT            -> let ((newregarray, nextlabel), newoutput) = evalInstr HALT regarray label output in
-                         "Execute " ++ show label ++ " " ++ show HALT ++
+                         "Execute instruction labeled " ++ show label ++ ": " ++ show HALT ++
                          "\nwith register(s): " ++ showRegArray regarray ++
                          "\n\n------------------\n" ++ "Program terminated\nwith register(s): " ++ showRegArray newregarray ++
                          "\n" ++ "and output: \"" ++ newoutput ++ "\"\n"
