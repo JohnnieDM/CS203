@@ -237,7 +237,7 @@ execStepwise program input = evalProgStepwise program (insert 0 input empty) 0 "
 
 ----our best wishes to everybody!-------------------------------------------------------
 main =
-  do program <- readFile "happy.txt"
+  do program <- readFile "Happy.txt"
      case parse rmParser "" program of
        Left e  -> print e >> fail "parse error"
        Right r -> case r of
