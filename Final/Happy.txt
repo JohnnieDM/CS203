@@ -1,0 +1,26 @@
+LET R0 += 'H';
+LET R0 += 'a';
+LET R0 += 'p';
+LET R0 += 'p';
+LET R0 += 'y';
+LET R0 += ' ';
+LET R0 += 'S';
+LET R0 += 'u';
+LET R0 += 'm';
+LET R0 += 'm';
+LET R0 += 'e';
+LET R0 += 'r';
+LET R0 += ' ';
+LET R0 += 'B';
+LET R0 += 'r';
+LET R0 += 'e';
+LET R0 += 'a';
+LET R0 += 'k';
+LET R0 += '!';
+LET R0 += ' ';
+LET R0 += '^';
+LET R0 += '_';
+LET R0 += '^';
+LET R0 += 'y';
+PRINT;
+HALT
