@@ -1,2 +1,0 @@
-1. Why is register machine Turing-complete while it only allows stack operations and limited branching instructions?
-2. Is register machine still Turing-complete if it only contains finitely many registers?
